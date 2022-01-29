@@ -1,7 +1,7 @@
 IMAGE_NAME = "bento/ubuntu-16.04"
 N = 2
 HOST_PREFIX = "192.168.56"
-SSH_PUB_KEY_DEST = "/home/vagrant/.ssh/id_rsa.pub"
+SSH_PUB_KEY_DEST = "/home/vagrant/.ssh/vm_local.pub"
 SSH_PUB_KEY_SRC = File.expand_path("~/.ssh/vm_local.pub")
 
 
@@ -20,19 +20,18 @@ Vagrant.configure("2") do |config|
         # designate port forward port
         master.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2220
 
-        ssh_pub_key = "/home/vagrant/.ssh/vm_local.pub"
-        master.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: ssh_pub_key
+        master.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: SSH_PUB_KEY_DEST
         master.vm.provision "shell", inline: <<-SHELL
           sudo apt update
-          if grep -sq "#{ssh_pub_key}" /home/vagrant/.ssh/authorized_keys; then
+          if grep -sq "#{SSH_PUB_KEY_DEST}" /home/vagrant/.ssh/authorized_keys; then
             echo "SSH keys already provisioned."
             exit 0;
           fi
           echo "SSH key provisioning."
           mkdir -p /home/vagrant/.ssh/
           touch /home/vagrant/.ssh/authorized_keys
-          cat #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-          cat #{ssh_pub_key} > /home/vagrant/.ssh/id_rsa.pub
+          cat #{SSH_PUB_KEY_DEST} >> /home/vagrant/.ssh/authorized_keys
+          cat #{SSH_PUB_KEY_DEST} > /home/vagrant/.ssh/id_rsa.pub
           chmod 644 /home/vagrant/.ssh/id_rsa.pub
           chown -R vagrant:vagrant /home/vagrant
           exit 0
@@ -55,7 +54,7 @@ Vagrant.configure("2") do |config|
 
             
             ssh_pub_key = "/home/vagrant/.ssh/vm_local.pub"
-            node.vm.provision "file", source: "../vm_local.pub", destination: ssh_pub_key
+            node.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: SSH_PUB_KEY_DEST
             node.vm.provision "shell", inline: <<-SHELL
             sudo apt update
             if grep -sq "#{ssh_pub_key}" /home/vagrant/.ssh/authorized_keys; then
@@ -65,8 +64,8 @@ Vagrant.configure("2") do |config|
             echo "SSH key provisioning."
             mkdir -p /home/vagrant/.ssh/
             touch /home/vagrant/.ssh/authorized_keys
-            cat #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-            cat #{ssh_pub_key} > /home/vagrant/.ssh/id_rsa.pub
+            cat #{SSH_PUB_KEY_DEST} >> /home/vagrant/.ssh/authorized_keys
+            cat #{SSH_PUB_KEY_DEST} > /home/vagrant/.ssh/id_rsa.pub
             chmod 644 /home/vagrant/.ssh/id_rsa.pub
             chown -R vagrant:vagrant /home/vagrant
             exit 0
@@ -79,7 +78,6 @@ Vagrant.configure("2") do |config|
             #     }
             # node.vm.network "forwarded_port", guest: 23, host: 4021 + i 
             # end
-            node.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: SSH_PUB_KEY_DEST
         end
     end
 end
