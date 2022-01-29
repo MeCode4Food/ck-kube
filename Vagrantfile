@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
         master.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2220
 
         ssh_pub_key = "/home/vagrant/.ssh/vm_local.pub"
-        master.vm.provision "file", source: "../vm_local.pub", destination: ssh_pub_key
+        master.vm.provision "file", source: "./vm_local.pub", destination: ssh_pub_key
         master.vm.provision "shell", inline: <<-SHELL
           sudo apt update
           if grep -sq "#{ssh_pub_key}" /home/vagrant/.ssh/authorized_keys; then
@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
             #     }
             # node.vm.network "forwarded_port", guest: 23, host: 4021 + i 
             # end
-            node.vm.provision "file", source: "../vm_local.pub", destination: "~/.ssh/vm_local.pub"
+            node.vm.provision "file", source: "./vm_local.pub", destination: "~/.ssh/vm_local.pub"
         end
     end
 end
