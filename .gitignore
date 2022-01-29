@@ -1,6 +1,3 @@
 .vagrant
 .Vagrantfile.swp
 *-console.log
-
-vm_local
-vm_local.pub

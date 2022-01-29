@@ -1,7 +1,8 @@
 IMAGE_NAME = "bento/ubuntu-16.04"
 N = 2
 HOST_PREFIX = "192.168.56"
-
+SSH_PUB_KEY_DEST = "/home/vagrant/.ssh/id_rsa.pub"
+SSH_PUB_KEY_SRC = File.expand_path("~/.ssh/vm_local.pub")
 
 
 Vagrant.configure("2") do |config|
@@ -20,7 +21,7 @@ Vagrant.configure("2") do |config|
         master.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2220
 
         ssh_pub_key = "/home/vagrant/.ssh/vm_local.pub"
-        master.vm.provision "file", source: "./vm_local.pub", destination: ssh_pub_key
+        master.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: ssh_pub_key
         master.vm.provision "shell", inline: <<-SHELL
           sudo apt update
           if grep -sq "#{ssh_pub_key}" /home/vagrant/.ssh/authorized_keys; then
@@ -78,7 +79,7 @@ Vagrant.configure("2") do |config|
             #     }
             # node.vm.network "forwarded_port", guest: 23, host: 4021 + i 
             # end
-            node.vm.provision "file", source: "./vm_local.pub", destination: "~/.ssh/vm_local.pub"
+            node.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: SSH_PUB_KEY_DEST
         end
     end
 end
