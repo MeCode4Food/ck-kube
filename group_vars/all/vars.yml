@@ -1,0 +1,2 @@
+# virtual box host ethernet adapter CIDR block prefix
+host_prefix: 192.168.56

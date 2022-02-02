@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: workers
   become: true
   tasks:
   - name: Install packages that allow apt to be used over HTTPS
@@ -35,8 +35,18 @@
       - docker-ce 
       - docker-ce-cli 
       - containerd.io
-    notify:
-      - docker status
+
+  - name: Change docker cgroups driver to systemd
+    copy:
+      content: |
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"]
+        }
+      dest: /etc/docker/daemon.json
+
+  - name: Restart Docker service
+    command: systemctl restart docker
+    notify: docker status
 
   - name: Add vagrant user to docker group
     user:
@@ -82,6 +92,7 @@
     lineinfile:
       path: /etc/default/kubelet
       line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
+      create: yes
 
   - name: Restart kubelet
     service:

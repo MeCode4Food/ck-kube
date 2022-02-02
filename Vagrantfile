@@ -52,7 +52,6 @@ Vagrant.configure("2") do |config|
             node.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2220 + i
             node.vm.hostname = "node-#{i}"
 
-            
             ssh_pub_key = "/home/vagrant/.ssh/vm_local.pub"
             node.vm.provision "file", source: SSH_PUB_KEY_SRC, destination: SSH_PUB_KEY_DEST
             node.vm.provision "shell", inline: <<-SHELL
